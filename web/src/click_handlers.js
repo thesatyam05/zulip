@@ -24,6 +24,7 @@ import * as message_lists from "./message_lists";
 import * as message_store from "./message_store";
 import * as muted_topics_ui from "./muted_topics_ui";
 import * as narrow from "./narrow";
+import * as narrow_state from "./narrow_state";
 import * as navigate from "./navigate";
 import {page_params} from "./page_params";
 import * as pm_list from "./pm_list";
@@ -182,6 +183,15 @@ export function initialize() {
 
         if (message_edit.is_editing(id)) {
             // Clicks on a message being edited shouldn't trigger a reply.
+            return;
+        }
+
+        if (narrow_state.filter()?.is_search()) {
+            // Clicks on a message from search results should bring the
+            // user to the message's near view instead of opening the
+            // compose box.
+            const msg = message_lists.current.selected_message();
+            window.location = hash_util.by_conversation_and_time_url(msg);
             return;
         }
 
